@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLConnection;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Controller;
@@ -32,28 +34,44 @@ import io.spring4mvc.spring4mvc.config.PicturesUploadProperties;
 @SessionAttributes("picturePath")
 public class PictureUploadController {
 
+	private final MessageSource messageSource;
 	private final Resource pictureDir;
 	private final Resource anonymousPicture;
 	
 	//TODO - #1-issue not working why?
+//	@RequestMapping("/upload-error")
+//	public ModelAndView onUploadError(HttpServletRequest request) {
+//		ModelAndView mav = new ModelAndView("profile/uploadPage");
+//		mav.addObject("error", request.getAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE));
+//		return mav;
+//	}
+	
 	@RequestMapping("/upload-error")
-	public ModelAndView onUploadError(HttpServletRequest request) {
+	public ModelAndView onUploadError(Locale locale) {
 		ModelAndView mav = new ModelAndView("profile/uploadPage");
-		mav.addObject("error", request.getAttribute(WebUtils.ERROR_EXCEPTION_ATTRIBUTE));
+		mav.addObject("error", messageSource.getMessage("upload.file.too.big", null, locale));
 		return mav;
 	}
 	
+//	@ExceptionHandler(IOException.class)
+//	public ModelAndView handleIOException(IOException exception) {
+//		ModelAndView mav = new ModelAndView("profile/uploadPage");
+//		mav.addObject("error", exception.getMessage());
+//		return mav;
+//	}
+	
 	@ExceptionHandler(IOException.class)
-	public ModelAndView handleIOException(IOException exception) {
+	public ModelAndView handleIOException(Locale locale) {
 		ModelAndView mav = new ModelAndView("profile/uploadPage");
-		mav.addObject("error", exception.getMessage());
+		mav.addObject("error", messageSource.getMessage("upload.io.exception", null, locale));
 		return mav;
 	}
 	
 	@Autowired
-	public PictureUploadController(PicturesUploadProperties picturesUploadProperties) {
+	public PictureUploadController(PicturesUploadProperties picturesUploadProperties, MessageSource messageSource) {
 		this.pictureDir = picturesUploadProperties.getUploadPath();
 		this.anonymousPicture = picturesUploadProperties.getAnonymousPicture();
+		this.messageSource = messageSource;
 	}
 	
 //	public static final Resource PICTURES_DIR = new FileSystemResource("./pictures");

@@ -2,7 +2,11 @@ package io.spring4mvc.spring4mvc.config;
 
 import java.time.LocalDate;
 
+import org.apache.catalina.connector.Connector;
+import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
+import org.springframework.boot.context.embedded.tomcat.TomcatConnectorCustomizer;
+import org.springframework.boot.context.embedded.tomcat.TomcatEmbeddedServletContainerFactory;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.ErrorPage;
 import org.springframework.context.annotation.Bean;
@@ -56,5 +60,17 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 			container -> container.addErrorPages(new ErrorPage(MultipartException.class, "/upload-error"));
 			
 		return embeddedServletContainerCustomizer;
+	}
+	
+	@Bean
+	public TomcatEmbeddedServletContainerFactory containerFactory() {
+	    TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
+	     factory.addConnectorCustomizers(new TomcatConnectorCustomizer() {
+			@Override
+			public void customize(Connector connector) {
+				((AbstractHttp11Protocol<?>) connector.getProtocolHandler()).setMaxSwallowSize(-1);
+			}
+		});
+		return factory;
 	}
 }
