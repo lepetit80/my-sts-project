@@ -15,9 +15,11 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
+import org.springframework.web.util.UrlPathHelper;
 
 import io.spring4mvc.spring4mvc.date.KRLocalDateFormatter;
 
@@ -73,4 +75,13 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 		});
 		return factory;
 	}
+	
+	//Spring MVC는 기본으로 URL에 세미콜론으로 이어진 모든 문자를 제거한다.
+	@Override
+	public void configurePathMatch(PathMatchConfigurer configurer) {
+		UrlPathHelper urlPathHelper = new UrlPathHelper();
+		urlPathHelper.setRemoveSemicolonContent(false);
+		configurer.setUrlPathHelper(urlPathHelper);
+	}
+	
 }
