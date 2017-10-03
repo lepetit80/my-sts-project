@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class SearchService {
 
-	@Autowired
 	private Twitter twitter;
 	
-//	public SearchService(Twitter twitter) {
-//		this.twitter = twitter;
-//	}
+	@Autowired
+	public SearchService(Twitter twitter) {
+		this.twitter = twitter;
+	}
 	
 	public List<Tweet> search(String searchType, List<String> keywords) {
 		final List<SearchParameters> searchs = keywords.stream()

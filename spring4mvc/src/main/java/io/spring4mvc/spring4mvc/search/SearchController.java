@@ -13,13 +13,12 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class SearchController {
 
-	@Autowired
 	private SearchService searchService;
 	
-//	@Autowired
-//	public SearchController(SearchServive searchService) {
-//		this.searchService = searchService;
-//	}
+	@Autowired
+	public SearchController(SearchService searchService) {
+		this.searchService = searchService;
+	}
 	
 	@RequestMapping("/search/{searchType}")
 	public ModelAndView search(@PathVariable String searchType, @MatrixVariable List<String> keywords) {

@@ -29,4 +29,10 @@ public class ProfileForm {
 	
 	@NotEmpty
     private List<String> tastes = new ArrayList<>();
+
+	@Override
+	public String toString() {
+		return "ProfileForm [twitterHandle=" + twitterHandle + ", email=" + email + ", birthDate=" + birthDate
+				+ ", tastes=" + tastes + "]";
+	}
 }

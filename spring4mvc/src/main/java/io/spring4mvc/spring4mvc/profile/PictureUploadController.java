@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,6 +38,15 @@ public class PictureUploadController {
 	private final MessageSource messageSource;
 	private final Resource pictureDir;
 	private final Resource anonymousPicture;
+	private final UserProfileSession userProfileSession;
+	
+	@Autowired
+	public PictureUploadController(PicturesUploadProperties picturesUploadProperties, MessageSource messageSource, UserProfileSession userProfileSession) {
+		this.pictureDir = picturesUploadProperties.getUploadPath();
+		this.anonymousPicture = picturesUploadProperties.getAnonymousPicture();
+		this.messageSource = messageSource;
+		this.userProfileSession = userProfileSession;
+	}
 	
 	//TODO - #1-issue not working why?
 //	@RequestMapping("/upload-error")
@@ -50,6 +60,7 @@ public class PictureUploadController {
 	public ModelAndView onUploadError(Locale locale) {
 		ModelAndView mav = new ModelAndView("profile/uploadPage");
 		mav.addObject("error", messageSource.getMessage("upload.file.too.big", null, locale));
+		mav.addObject("profileForm", userProfileSession.toForm());
 		return mav;
 	}
 	
@@ -67,13 +78,6 @@ public class PictureUploadController {
 		return mav;
 	}
 	
-	@Autowired
-	public PictureUploadController(PicturesUploadProperties picturesUploadProperties, MessageSource messageSource) {
-		this.pictureDir = picturesUploadProperties.getUploadPath();
-		this.anonymousPicture = picturesUploadProperties.getAnonymousPicture();
-		this.messageSource = messageSource;
-	}
-	
 //	public static final Resource PICTURES_DIR = new FileSystemResource("./pictures");
 	
 	@RequestMapping("upload")
@@ -87,28 +91,36 @@ public class PictureUploadController {
 	}
 	
 	@RequestMapping(value = "/uploadedPicture")
-	public void getUploadedPicture(HttpServletResponse response, 
-		@ModelAttribute("picturePath") Resource picturePath) throws IOException {
+	public void getUploadedPicture(HttpServletResponse response) throws IOException {
 //		ClassPathResource classPathResource = new ClassPathResource("/images/anonymous.png");
 //		response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(classPathResource.getFilename()));
 //		IOUtils.copy(classPathResource.getInputStream(), response.getOutputStream());
+		
+		Resource picturePath = userProfileSession.getPicturePath();
+		
+		if (picturePath == null) {
+			picturePath = anonymousPicture;
+		}
+		
 		response.setHeader("Content-Type", URLConnection.guessContentTypeFromName(picturePath.getFilename()));
 		IOUtils.copy(picturePath.getInputStream(), response.getOutputStream());
 	}
 	
-	@RequestMapping(value = "/upload", method = RequestMethod.POST)
-	public String onUpload(MultipartFile file, RedirectAttributes redirectAttributes, Model model) throws IOException {
+	@RequestMapping(value = "/profile", params = {"upload"}, method = RequestMethod.POST)
+	public String onUpload(@RequestParam MultipartFile file, RedirectAttributes redirectAttributes) throws IOException {
 		
 		if (file.isEmpty() || !isImage(file)) {
-//			redirectAttributes.addFlashAttribute("error", "Incorrect file. plz upload a picture.");
-//			return "redirect:/upload";
-			throw new IOException("Incorrect file. plz upload a picture.");
+			redirectAttributes.addFlashAttribute("error", "Incorrect file. plz upload a picture.");
+			return "redirect:/profile";
+//			throw new IOException("Incorrect file. plz upload a picture.");
 		}
 		
 		Resource picturePath = copyFileToPictures(file);
-		model.addAttribute("picturePath", picturePath);
+		userProfileSession.setPicturePath(picturePath);
 		
-		return "profile/uploadPage";
+		return "redirect:/profile";
+//		model.addAttribute("picturePath", picturePath);
+//		return "profile/uploadPage";
 	}
 
 	private boolean isImage(MultipartFile file) {
