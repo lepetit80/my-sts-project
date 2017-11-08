@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.spring4mvc.spring4mvc.error.EntityNotFoundException;
+
 @RestController
 @RequestMapping("/api")
 public class UserApiController {
@@ -51,21 +53,21 @@ public class UserApiController {
 	}
 	
 	@PutMapping("/user/{email}")
-	public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User user) {
+	public ResponseEntity<User> updateUser(@PathVariable String email, @RequestBody User user) throws EntityNotFoundException {
 		if (!userRepository.exists(email)) {
 			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
 		}
 		
-		User updtUser = userRepository.save(email, user);
+		User updtUser = userRepository.update(email, user);
 		
 		return new ResponseEntity<>(updtUser, HttpStatus.CREATED);
 	}
 	
 	@DeleteMapping("/user/{email}")
-	public ResponseEntity<User> deleteUser(@PathVariable String email) {
-		if (!userRepository.exists(email)) {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	public ResponseEntity<User> deleteUser(@PathVariable String email) throws EntityNotFoundException {
+//		if (!userRepository.exists(email)) {
+//			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+//		}
 		
 		userRepository.delete(email);
 		return new ResponseEntity<>(HttpStatus.OK);

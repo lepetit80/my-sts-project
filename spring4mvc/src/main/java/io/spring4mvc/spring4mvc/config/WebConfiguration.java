@@ -88,6 +88,7 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 		urlPathHelper.setRemoveSemicolonContent(false);
 		configurer.setUrlPathHelper(urlPathHelper);
 		configurer.setUseRegisteredSuffixPatternMatch(false);
+		configurer.setUseSuffixPatternMatch(false);
 	}
 	
 	@Bean
