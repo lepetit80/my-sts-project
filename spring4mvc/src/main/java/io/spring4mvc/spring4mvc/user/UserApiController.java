@@ -28,8 +28,8 @@ public class UserApiController {
 	}
 	
 	@GetMapping("/users")
-	public List<User> findAll() {
-		return userRepository.findAll();
+	public ResponseEntity<List<User>> findAll() {
+		return new ResponseEntity<List<User>>(userRepository.findAll(), HttpStatus.OK);
 	}
 	
 //	//Using postman body(json)

@@ -27,8 +27,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import io.spring4mvc.spring4mvc.date.KRLocalDateFormatter;
+import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @Configuration
+@EnableSwagger2
 @EnableConfigurationProperties({PicturesUploadProperties.class})
 public class WebConfiguration extends WebMvcConfigurerAdapter {
 	
