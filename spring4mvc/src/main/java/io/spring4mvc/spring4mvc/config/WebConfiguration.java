@@ -2,6 +2,8 @@ package io.spring4mvc.spring4mvc.config;
 
 import java.time.LocalDate;
 
+import javax.sql.DataSource;
+
 import org.apache.catalina.connector.Connector;
 import org.apache.coyote.http11.AbstractHttp11Protocol;
 import org.springframework.boot.context.embedded.EmbeddedServletContainerCustomizer;
@@ -14,6 +16,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.security.crypto.encrypt.Encryptors;
+import org.springframework.social.connect.ConnectionFactoryLocator;
+import org.springframework.social.connect.UsersConnectionRepository;
+import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.web.multipart.MultipartException;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -100,5 +106,11 @@ public class WebConfiguration extends WebMvcConfigurerAdapter {
 		objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, false);
 		return objectMapper;
 	}
+	
+//	@Bean
+//	@Primary
+//	public UsersConnectionRepository getUsersConnectionRepository(DataSource dataSource, ConnectionFactoryLocator connectionFactoryLocator) {
+//		return new JdbcUsersConnectionRepository(dataSource, connectionFactoryLocator, Encryptors.noOpText());
+//	}
 	
 }
